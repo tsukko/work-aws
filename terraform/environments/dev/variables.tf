@@ -52,28 +52,25 @@ variable "task_memory" {
   default     = "512"
 }
 
-variable "repository_name" {
-  description = "Application CodeCommit repository name"
+variable "app_repository_owner" {
+  description = "GitHub repository owner (e.g., tsukko)"
   type        = string
-  # 例: "my-app-repo"
-}
-
-variable "repository_branch" {
-  description = "Application repository branch to deploy"
-  type        = string
-  default     = "main"
 }
 
 variable "app_repository_name" {
-  description = "Application repository name (alias for repository_name, for backward compatibility)"
+  description = "GitHub repository name (e.g., work-ecs-app)"
   type        = string
-  default     = ""
 }
 
 variable "app_repository_branch" {
-  description = "Application repository branch (alias for repository_branch)"
+  description = "Application repository branch"
   type        = string
   default     = "main"
+}
+
+variable "codestar_connection_arn" {
+  description = "CodeStar Connections ARN for GitHub"
+  type        = string
 }
 
 variable "codebuild_compute_type" {
@@ -91,5 +88,5 @@ variable "codebuild_image" {
 variable "buildspec_content" {
   description = "Buildspec content"
   type        = string
-  default     = file("${path.module}/buildspec.yml")
+  default     = ""
 }

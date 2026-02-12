@@ -30,15 +30,23 @@ provider "aws" {
   }
 }
 
+# Load buildspec content from file
+locals {
+  buildspec_content = var.buildspec_content != "" ? var.buildspec_content : file("${path.module}/buildspec.yml")
+  # Build and Deploy pipelines use separate S3 buckets for artifacts
+  # IAM roles need access to both buckets
+  artifact_bucket_arn = "arn:aws:s3:::*${var.environment}*artifact*"
+}
+
 # ネットワークモジュール
 module "network" {
   source = "../../modules/network"
 
-  environment          = var.environment
-  vpc_cidr_block       = var.vpc_cidr_block
-  public_subnet_cidr   = var.public_subnet_cidr
-  availability_zone    = var.availability_zone
-  container_port       = var.container_port
+  environment        = var.environment
+  vpc_cidr_block     = var.vpc_cidr_block
+  public_subnet_cidr = var.public_subnet_cidr
+  availability_zone  = var.availability_zone
+  container_port     = var.container_port
 }
 
 # IAMモジュール
@@ -46,45 +54,45 @@ module "iam" {
   source = "../../modules/iam"
 
   environment         = var.environment
-  artifact_bucket_arn = module.codepipeline.artifact_bucket_arn
+  artifact_bucket_arn = local.artifact_bucket_arn
 }
 
 # ECSモジュール
 module "ecs" {
   source = "../../modules/ecs"
 
-  environment                   = var.environment
-  aws_region                    = var.aws_region
-  container_port                = var.container_port
-  task_cpu                       = var.task_cpu
-  task_memory                    = var.task_memory
-  ecr_repository_uri            = aws_ecr_repository.main.repository_url
-  ecs_task_execution_role_arn   = module.iam.ecs_task_execution_role_arn
-  ecs_task_role_arn             = module.iam.ecs_task_role_arn
-  public_subnet_id              = module.network.public_subnet_id
-  ecs_security_group_id         = module.network.ecs_security_group_id
+  environment                 = var.environment
+  aws_region                  = var.aws_region
+  container_port              = var.container_port
+  task_cpu                    = var.task_cpu
+  task_memory                 = var.task_memory
+  ecr_repository_uri          = aws_ecr_repository.main.repository_url
+  ecs_task_execution_role_arn = module.iam.ecs_task_execution_role_arn
+  ecs_task_role_arn           = module.iam.ecs_task_role_arn
+  public_subnet_id            = module.network.public_subnet_id
+  ecs_security_group_id       = module.network.ecs_security_group_id
 }
 
 # CodePipelineモジュール
 module "codepipeline" {
   source = "../../modules/codepipeline"
 
-  environment                    = var.environment
-  codepipeline_role_arn          = module.iam.codepipeline_role_arn
-  codebuild_role_arn             = module.iam.codebuild_role_arn
-  
+  environment           = var.environment
+  codepipeline_role_arn = module.iam.codepipeline_role_arn
+  codebuild_role_arn    = module.iam.codebuild_role_arn
+
   # Build Pipeline
-  app_repository_name            = var.app_repository_name != "" ? var.app_repository_name : var.repository_name
-  app_repository_branch          = var.app_repository_branch
-  codebuild_compute_type         = var.codebuild_compute_type
-  codebuild_image                = var.codebuild_image
-  buildspec_content              = var.buildspec_content
-  
+  app_repository_owner    = var.app_repository_owner
+  app_repository_name     = var.app_repository_name
+  app_repository_branch   = var.app_repository_branch
+  codestar_connection_arn = var.codestar_connection_arn
+  codebuild_compute_type  = var.codebuild_compute_type
+  codebuild_image         = var.codebuild_image
+  buildspec_content       = local.buildspec_content
+
   # Deploy Pipeline
-  ecs_cluster_name               = module.ecs.ecs_cluster_name
-  ecs_service_name               = module.ecs.ecs_service_name
-  ecs_task_execution_role_arn    = module.iam.ecs_task_execution_role_arn
-  ecs_task_role_arn              = module.iam.ecs_task_role_arn
+  ecs_cluster_name = module.ecs.ecs_cluster_name
+  ecs_service_name = module.ecs.ecs_service_name
 }
 
 # ECR Repository (メインのモジュール外)
@@ -111,9 +119,9 @@ resource "aws_ecr_lifecycle_policy" "main" {
         rulePriority = 1
         description  = "Keep last 10 images"
         selection = {
-          tagStatus     = "any"
-          countType     = "imageCountMoreThan"
-          countNumber   = 10
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
+          countNumber = 10
         }
         action = {
           type = "expire"
