@@ -45,14 +45,15 @@ resource "aws_codepipeline" "deploy_pipeline" {
       name             = "SourceTaskDef"
       category         = "Source"
       owner            = "AWS"
-      provider         = "CodeCommit"
+      provider         = "CodeStarSourceConnection"
       version          = "1"
       output_artifacts = ["taskdef_output"]
 
       configuration = {
-        RepositoryName       = var.app_repository_name
-        BranchName           = var.app_repository_branch
-        PollForSourceChanges = "false"
+        FullRepositoryId      = "${var.app_repository_owner}/${var.app_repository_name}"
+        BranchName            = var.app_repository_branch
+        ConnectionArn         = var.codestar_connection_arn
+        PollForSourceChanges  = "false"
       }
     }
   }

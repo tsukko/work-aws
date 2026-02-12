@@ -4,8 +4,13 @@ variable "environment" {
 }
 
 # Build Pipeline variables
+variable "app_repository_owner" {
+  description = "GitHub repository owner (e.g., tsukko)"
+  type        = string
+}
+
 variable "app_repository_name" {
-  description = "Application repository name (where Dockerfile, buildspec.yml, taskdef.json are located)"
+  description = "GitHub repository name (e.g., work-ecs-app)"
   type        = string
 }
 
@@ -13,6 +18,11 @@ variable "app_repository_branch" {
   description = "Application repository branch"
   type        = string
   default     = "main"
+}
+
+variable "codestar_connection_arn" {
+  description = "CodeStar Connections ARN for GitHub (created in AWS Console)"
+  type        = string
 }
 
 variable "codebuild_compute_type" {
