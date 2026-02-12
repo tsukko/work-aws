@@ -1,0 +1,19 @@
+# デプロイ用のDocker Imageテンプレート
+# このファイルをアプリケーションのコードリポジトリに配置してください
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# 必要な依存パッケージをインストール
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# アプリケーションコードをコピー
+COPY . .
+
+# ポート8080をリッスン
+EXPOSE 8080
+
+# アプリケーション起動
+CMD ["python", "app.py"]
