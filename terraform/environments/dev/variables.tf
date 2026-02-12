@@ -53,13 +53,25 @@ variable "task_memory" {
 }
 
 variable "repository_name" {
-  description = "CodeCommit repository name"
+  description = "Application CodeCommit repository name"
   type        = string
   # 例: "my-app-repo"
 }
 
 variable "repository_branch" {
-  description = "Repository branch to deploy"
+  description = "Application repository branch to deploy"
+  type        = string
+  default     = "main"
+}
+
+variable "app_repository_name" {
+  description = "Application repository name (alias for repository_name, for backward compatibility)"
+  type        = string
+  default     = ""
+}
+
+variable "app_repository_branch" {
+  description = "Application repository branch (alias for repository_branch)"
   type        = string
   default     = "main"
 }

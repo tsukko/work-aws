@@ -13,12 +13,22 @@ output "ecs_service_name" {
   value       = module.ecs.ecs_service_name
 }
 
-output "codepipeline_arn" {
-  description = "CodePipeline ARN"
-  value       = module.codepipeline.codepipeline_arn
+output "build_pipeline_arn" {
+  description = "Build Pipeline ARN"
+  value       = module.codepipeline.build_pipeline_arn
 }
 
-output "artifact_bucket" {
-  description = "CodePipeline artifact bucket"
-  value       = module.codepipeline.artifact_bucket_name
+output "deploy_pipeline_arn" {
+  description = "Deploy Pipeline ARN"
+  value       = module.codepipeline.deploy_pipeline_arn
+}
+
+output "build_artifacts_bucket" {
+  description = "Build artifacts bucket"
+  value       = module.codepipeline.build_artifacts_bucket
+}
+
+output "deploy_artifacts_bucket" {
+  description = "Deploy artifacts bucket"
+  value       = module.codepipeline.deploy_artifacts_bucket
 }

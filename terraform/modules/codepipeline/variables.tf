@@ -3,35 +3,16 @@ variable "environment" {
   type        = string
 }
 
-variable "codepipeline_role_arn" {
-  description = "CodePipeline role ARN"
+# Build Pipeline variables
+variable "app_repository_name" {
+  description = "Application repository name (where Dockerfile, buildspec.yml, taskdef.json are located)"
   type        = string
 }
 
-variable "codebuild_role_arn" {
-  description = "CodeBuild role ARN"
-  type        = string
-}
-
-variable "repository_name" {
-  description = "CodeCommit repository name"
-  type        = string
-}
-
-variable "repository_branch" {
-  description = "CodeCommit repository branch"
+variable "app_repository_branch" {
+  description = "Application repository branch"
   type        = string
   default     = "main"
-}
-
-variable "ecs_cluster_name" {
-  description = "ECS cluster name"
-  type        = string
-}
-
-variable "ecs_service_name" {
-  description = "ECS service name"
-  type        = string
 }
 
 variable "codebuild_compute_type" {
@@ -48,5 +29,28 @@ variable "codebuild_image" {
 
 variable "buildspec_content" {
   description = "Buildspec content"
+  type        = string
+  default     = ""
+}
+
+# Deploy Pipeline variables
+variable "ecs_cluster_name" {
+  description = "ECS cluster name"
+  type        = string
+}
+
+variable "ecs_service_name" {
+  description = "ECS service name"
+  type        = string
+}
+
+# IAM roles
+variable "codepipeline_role_arn" {
+  description = "CodePipeline role ARN"
+  type        = string
+}
+
+variable "codebuild_role_arn" {
+  description = "CodeBuild role ARN"
   type        = string
 }

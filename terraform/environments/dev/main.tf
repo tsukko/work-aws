@@ -69,16 +69,22 @@ module "ecs" {
 module "codepipeline" {
   source = "../../modules/codepipeline"
 
-  environment              = var.environment
-  codepipeline_role_arn    = module.iam.codepipeline_role_arn
-  codebuild_role_arn       = module.iam.codebuild_role_arn
-  repository_name          = var.repository_name
-  repository_branch        = var.repository_branch
-  ecs_cluster_name         = module.ecs.ecs_cluster_name
-  ecs_service_name         = module.ecs.ecs_service_name
-  codebuild_compute_type   = var.codebuild_compute_type
-  codebuild_image          = var.codebuild_image
-  buildspec_content        = var.buildspec_content
+  environment                    = var.environment
+  codepipeline_role_arn          = module.iam.codepipeline_role_arn
+  codebuild_role_arn             = module.iam.codebuild_role_arn
+  
+  # Build Pipeline
+  app_repository_name            = var.app_repository_name != "" ? var.app_repository_name : var.repository_name
+  app_repository_branch          = var.app_repository_branch
+  codebuild_compute_type         = var.codebuild_compute_type
+  codebuild_image                = var.codebuild_image
+  buildspec_content              = var.buildspec_content
+  
+  # Deploy Pipeline
+  ecs_cluster_name               = module.ecs.ecs_cluster_name
+  ecs_service_name               = module.ecs.ecs_service_name
+  ecs_task_execution_role_arn    = module.iam.ecs_task_execution_role_arn
+  ecs_task_role_arn              = module.iam.ecs_task_role_arn
 }
 
 # ECR Repository (メインのモジュール外)
